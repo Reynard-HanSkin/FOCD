@@ -35,14 +35,21 @@ enum InputSourceManager {
             TISSelectInputSource(language.inputSource!)
             
             if language == .korean {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    // 씹혔는지 확인하고 다시시도
-                    let currentTIS = TISInputSource.current
-                    if currentTIS.id != "com.apple.keylayout.2SetHangul" &&
-                       currentTIS.id != language.inputSource!.id {
-                        logger.error("씹힘 감지 다시시도")
-                        TISSelectInputSource(Language.english.inputSource!)
-                        TISSelectInputSource(language.inputSource!)
+                guard let targetID = language.inputSource?.id else { return }
+                
+                if !targetID.contains("Gureum") {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        // 씹혔는지 확인하고 다시시도
+                        let currentTIS = TISInputSource.current
+                        print("------------------------------------")
+                        print("발견된 ID: \(currentTIS.id)")
+                        print("------------------------------------")
+                        if !currentTIS.id.contains("Hangul") &&
+                            currentTIS.id != language.inputSource!.id {
+                            logger.error("씹힘 감지 다시시도")
+                            TISSelectInputSource(Language.english.inputSource!)
+                            TISSelectInputSource(language.inputSource!)
+                        }
                     }
                 }
             }
@@ -76,7 +83,13 @@ enum InputSourceManager {
         }()
         
         static let korean = {
-            guard let inputSource = inputSources.first(where: { $0.id == "com.apple.inputmethod.Korean.2SetKorean" }) else {
+            print("--- [사용 가능한 모든 입력 소스 ID] ---")
+            for source in inputSources {
+                print("발견된 ID: \(source.id)")
+            }
+            print("------------------------------------")
+            
+            guard let inputSource = inputSources.first(where: { $0.id.hasPrefix("com.apple.inputmethod.Korean.") ||  $0.id.hasPrefix("org.youknowone.inputmethod.Gureum.")}) else {
                 logger.fault("Failed to find Korean input source from list.")
                 fatalError("Failed to find Korean input source from list.")
             }
