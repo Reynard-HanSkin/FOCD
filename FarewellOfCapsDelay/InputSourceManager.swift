@@ -35,18 +35,14 @@ enum InputSourceManager {
             TISSelectInputSource(language.inputSource!)
             
             if language == .korean {
-                guard let targetID = language.inputSource?.id else { return }
-                
-                if !targetID.contains("Gureum") {
+                if !language.isGuremTIS {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         // 씹혔는지 확인하고 다시시도
                         let currentTIS = TISInputSource.current
-                        print("------------------------------------")
-                        print("발견된 ID: \(currentTIS.id)")
-                        print("------------------------------------")
-                        if !currentTIS.id.contains("Hangul") &&
+                        logger.debug("Found ID: \(currentTIS.id)")
+                        if !currentTIS.id.hasSuffix("Hangul") &&
                             currentTIS.id != language.inputSource!.id {
-                            logger.error("씹힘 감지 다시시도")
+                            logger.info("씹힘 감지 다시시도")
                             TISSelectInputSource(Language.english.inputSource!)
                             TISSelectInputSource(language.inputSource!)
                         }
@@ -73,6 +69,9 @@ enum InputSourceManager {
     struct Language: Equatable {
         let inputSource: TISInputSource?
         
+        /// A cache to avoid to repeating `String.contain(_:)`
+        var isGuremTIS: Bool = false
+        
         private init(_ inputSource: TISInputSource?) {
             self.inputSource = inputSource
         }
@@ -83,22 +82,29 @@ enum InputSourceManager {
         }()
         
         static let korean = {
-            print("--- [사용 가능한 모든 입력 소스 ID] ---")
             for source in inputSources {
-                print("발견된 ID: \(source.id)")
+                logger.debug("Available Kor-TIS ID: \(source.id)")
             }
-            print("------------------------------------")
             
-            guard let inputSource = inputSources.first(where: { $0.id.hasPrefix("com.apple.inputmethod.Korean.") ||  $0.id.hasPrefix("org.youknowone.inputmethod.Gureum.")}) else {
-                logger.fault("Failed to find Korean input source from list.")
+            guard let inputSource = inputSources.first(where: {
+                $0.id.hasPrefix("com.apple.inputmethod.Korean.")
+                || $0.id.hasPrefix("org.youknowone.inputmethod.Gureum.")
+            }) else {
+                logger.error("Failed to find Korean input source from list.")
                 fatalError("Failed to find Korean input source from list.")
             }
-            return Language(inputSource)
+            var lang = Language(inputSource)
+            
+            if lang.inputSource!.id.hasPrefix("org.youknowone.inputmethod.Gureum.") {
+                lang.isGuremTIS = true
+            }
+            
+            return lang
         }()
         static let english = {
             guard let inputSource = inputSources.first(where: { $0.id == "com.apple.keylayout.ABC" }) else {
-                logger.fault("Failed to find Korean input source from list.")
-                fatalError("Failed to find Korean input source from list.")
+                logger.error("Failed to find English input source from list.")
+                fatalError("Failed to find English input source from list.")
             }
             return Language(inputSource)
         }()
