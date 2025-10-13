@@ -99,6 +99,7 @@ final class InputManager {
             if isShiftPressed {
                 // Activate/Deactivate capslock + set to eng
                 isCapslockOn.toggle()
+                setCapslockState(isCapslockOn)
                 if InputSourceManager.currentInputSource != .english {
                     InputSourceManager.setInputSource(to: .english)
                 }
@@ -106,9 +107,7 @@ final class InputManager {
             } else if isCapslockOn {
                 // Deactivate capslock only
                 isCapslockOn = false
-                if #unavailable(macOS 15.2) {
-                    setCapslockState(false)
-                }
+                setCapslockState(false)
                 break
             }
 
