@@ -19,24 +19,6 @@ final class InputManager {
         } else {
             tertiaryIM = nil
         }
-        
-        if #available(macOS 15.2, *) {
-            // Watch capslock state
-            NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-                guard let self else { return }
-                guard !event.modifierFlags.contains(.shift) else { return }
-                
-                // 캡스락 이벤트가 발생하고 나서 캡스락 상태를 설정
-                if !isCapslockOn && event.modifierFlags.contains(.capsLock) {
-                    if event.keyCode == Keys.capsLock {
-                        self.setCapslockState(false)
-                    }
-                    
-                    // 캡스락 끄는 동작을 처리하면 비정상적으로 동작하는 것으로 보임 (원인불명)
-                    // 무시하면 알아서 꺼지므로 따로 처리 하지 말 것
-                }
-            }
-        }
     }
     
     public static let shared = InputManager()
