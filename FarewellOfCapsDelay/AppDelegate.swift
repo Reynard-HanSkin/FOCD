@@ -1,4 +1,5 @@
 import AppKit
+import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     var statusBar: NSStatusBar!
@@ -28,7 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         englishMenuItem.target = self
         englishMenuItem.action = #selector(setInputSourceEnglish)
         englishMenuItem.identifier = NSUserInterfaceItemIdentifier("menuItem.english")
-        
+                
         let koreanMenuItem = NSMenuItem()
         koreanMenuItem.title = "한국어"
         koreanMenuItem.target = self
@@ -53,6 +54,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         fixPopupMenuItem.action = #selector(togglePopupFix)
         fixPopupMenuItem.identifier = NSUserInterfaceItemIdentifier("menuItem.fixPopup")
         
+        let testItem = NSMenuItem()
+        testItem.title = "시스템 설정 마법사 (베타)"
+        testItem.target = self
+        testItem.action = #selector(showDialog)
+        testItem.identifier = NSUserInterfaceItemIdentifier("menuItem.preference")
+        
         let hideBarItemMenuItem = NSMenuItem()
         hideBarItemMenuItem.title = "상태 바 아이콘 숨기기"
         hideBarItemMenuItem.target = self
@@ -67,12 +74,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         statusBarMenu.addItem(koreanMenuItem)
         statusBarMenu.addItem(japaneseMenuItem)
         statusBarMenu.addItem(chineseMenuItem)
+        statusBarMenu.addItem(.separator())
         if #available(macOS 14, *) {
-            statusBarMenu.addItem(.separator())
             statusBarMenu.addItem(fixPopupMenuItem)
         }
-        statusBarMenu.addItem(.separator())
+        statusBarMenu.addItem(testItem)
         statusBarMenu.addItem(hideBarItemMenuItem)
+        statusBarMenu.addItem(.separator())
         statusBarMenu.addItem(quitMenuItem)
         
         if showStatusMenuItem {
@@ -83,6 +91,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         
         if #available(macOS 14, *), fixPopup {
             popupFix.start()
+        }
+        
+        // Check HID access and request permission
+        let access = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent)
+        if access.rawValue != 0 { // If NOT granted
+            PreferenceHelper.askInputMonitoringPermission()
         }
     }
     
@@ -195,10 +209,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
                 let dialog = NSAlert()
                 dialog.messageText = "접근성 권한 필요"
                 dialog.informativeText = "해당 기능을 사용하기 위해선 접근성 권한이 필요합니다. '설정 > 개인정보 보호 및 보안 > 손쉬운 사용'에서 FOCD를 추가 후 재시작 해주세요."
-                dialog.addButton(withTitle: "확인")
+                let button = dialog.addButton(withTitle: "설정")
+                button.action = #selector(askAccessibilityPermission)
                 dialog.runModal()
             }
         }
+    }
+    
+    @objc
+    func askAccessibilityPermission() {
+        IOHIDRequestAccess(kIOHIDRequestTypePostEvent)
+    }
+    
+    @objc func showDialog() {
+        let dialog = PreferenceDialog()
+        let hostController = NSHostingController(rootView: dialog)
+        let window = NSWindow(contentViewController: hostController)
+        let fixedWidth = 270
+        let fixedHeight = 300
+        window.setContentSize(.init(width: fixedWidth, height: fixedHeight))
+        window.styleMask.remove(.resizable)
+        window.styleMask.remove(.fullScreen)
+        window.styleMask.remove(.miniaturizable)
+        window.level = .modalPanel
+        window.tabbingMode = .disallowed
+        window.identifier = .init("pref-dialog")
+        window.title = "시스템 설정 마법사"
+        
+        let controller = NSWindowController(window: window)
+        controller.showWindow(self)
     }
     
     @objc func hideBarItem() {

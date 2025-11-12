@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A2F19E02EB4E41B00A8A01B /* PreferenceHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A2F19DF2EB4E41B00A8A01B /* PreferenceHelper.swift */; };
 		1A7806C32C71F88C0080D50A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7806C22C71F88C0080D50A /* AppDelegate.swift */; };
 		1A7806C72C71F88C0080D50A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7806C62C71F88C0080D50A /* Assets.xcassets */; };
 		1A7806D22C71F94B0080D50A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7806D12C71F94B0080D50A /* main.swift */; };
@@ -14,9 +15,11 @@
 		1A7806D72C7205020080D50A /* InputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7806D62C7205020080D50A /* InputManager.swift */; };
 		1A7806D92C720C550080D50A /* InputSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7806D82C720C550080D50A /* InputSourceManager.swift */; };
 		1AF8EAA02CF1A32900E14740 /* UserDefaultWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF8EA9F2CF1A32900E14740 /* UserDefaultWrapper.swift */; };
+		1AFBF1472EBB7BD200A66535 /* PreferenceDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AFBF1462EBB7BD200A66535 /* PreferenceDialog.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1A2F19DF2EB4E41B00A8A01B /* PreferenceHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceHelper.swift; sourceTree = "<group>"; };
 		1A7806BF2C71F88C0080D50A /* FOCD.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FOCD.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A7806C22C71F88C0080D50A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		1A7806C62C71F88C0080D50A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -27,6 +30,7 @@
 		1A7806D82C720C550080D50A /* InputSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputSourceManager.swift; sourceTree = "<group>"; };
 		1ADDFE362C7245E800C20D73 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1AF8EA9F2CF1A32900E14740 /* UserDefaultWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultWrapper.swift; sourceTree = "<group>"; };
+		1AFBF1462EBB7BD200A66535 /* PreferenceDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferenceDialog.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -69,6 +73,8 @@
 				1A7806D62C7205020080D50A /* InputManager.swift */,
 				1A7806D82C720C550080D50A /* InputSourceManager.swift */,
 				1AF8EA9F2CF1A32900E14740 /* UserDefaultWrapper.swift */,
+				1A2F19DF2EB4E41B00A8A01B /* PreferenceHelper.swift */,
+				1AFBF1462EBB7BD200A66535 /* PreferenceDialog.swift */,
 				1ADDFE362C7245E800C20D73 /* Info.plist */,
 				1A7806C62C71F88C0080D50A /* Assets.xcassets */,
 				1A7806D32C72014D0080D50A /* Main.storyboard */,
@@ -150,8 +156,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1A2F19E02EB4E41B00A8A01B /* PreferenceHelper.swift in Sources */,
 				1A7806D72C7205020080D50A /* InputManager.swift in Sources */,
 				1AF8EAA02CF1A32900E14740 /* UserDefaultWrapper.swift in Sources */,
+				1AFBF1472EBB7BD200A66535 /* PreferenceDialog.swift in Sources */,
 				1A7806C32C71F88C0080D50A /* AppDelegate.swift in Sources */,
 				1A7806D92C720C550080D50A /* InputSourceManager.swift in Sources */,
 				1A7806D22C71F94B0080D50A /* main.swift in Sources */,
@@ -318,7 +326,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.GST.focd;
 				PRODUCT_NAME = FOCD;
@@ -355,7 +363,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 12.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.GST.focd;
 				PRODUCT_NAME = FOCD;
