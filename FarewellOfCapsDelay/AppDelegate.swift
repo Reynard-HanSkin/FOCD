@@ -49,7 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         chineseMenuItem.identifier = NSUserInterfaceItemIdentifier("menuItem.chinese")
         
         let fixPopupMenuItem = NSMenuItem()
-        fixPopupMenuItem.title = "한영 팝업 고치기 (베타)"
+        fixPopupMenuItem.title = "한영 팝업 고치기"
         fixPopupMenuItem.target = self
         fixPopupMenuItem.action = #selector(togglePopupFix)
         fixPopupMenuItem.identifier = NSUserInterfaceItemIdentifier("menuItem.fixPopup")
