@@ -37,6 +37,10 @@ macOS 14 Sonoma 기준
 ## 제거
 앱 파일을 삭제
 
+## Karabiner 사용시
+[가이드](https://github.com/GST-Main/FOCD/blob/master/Karabiner.md) 참고
+
+
 ## 업데이트 로그
 ### 1.1.0
 * 고부하 상태에서 간헐적인 한영전환 씹힘 문제를 완화하였습니다.
