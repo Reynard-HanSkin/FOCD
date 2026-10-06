@@ -71,6 +71,8 @@ enum InputSourceManager {
     /// 빠르게 다른 언어로 전환했다 돌아오기.
     ///
     /// 팝업 픽스 전용
+    /// TIS API는 메인 스레드에서만 호출해야 한다.
+    @MainActor
     static func rapidDummyAction() {
         let current = currentInputSource
         if current == .english {

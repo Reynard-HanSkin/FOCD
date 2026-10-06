@@ -75,6 +75,7 @@ final class PopupFix {
         }
     }
     
+    @MainActor
     func enterPDM(with popup: UIElement) async {
         PDM = true
         await destroyPopup(popup)
@@ -83,6 +84,7 @@ final class PopupFix {
         PDM = false
     }
     
+    @MainActor
     func destroyPopup(_ popup: UIElement, repeating count: Int = 8) async {
         let hiddenPosition = CGPoint(x: 30_000, y: 30_000)
         popup.setPosition(to: hiddenPosition)
