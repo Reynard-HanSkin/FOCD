@@ -2,7 +2,7 @@ import Foundation
 import Combine
 
 final class PopupFix {
-    let inputManager = InputManager.shared
+    let inputManager = CapsLockMonitor.shared
     let appObserver = ApplicationObserver.global
     
     var isRunning: Bool {

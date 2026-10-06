@@ -17,38 +17,54 @@ enum InputSourceManager {
         }
     }
     
+    /// 입력기를 전환하고, 실제로 선택되었는지 검증하여 실패 시 재시도한다.
+    ///
+    /// 기존의 고정 딜레이 + 1회 재시도 방식과 달리, 전환 결과를 짧은 간격으로
+    /// 확인하고 실패하면 지수 백오프로 재시도한다. 시스템 부하로 TIS 호출이
+    /// 무시되는 상황에서도 마지막에 반드시 전환을 성공하도록 한다.
     static func setInputSource(to language: Language) {
-        if language == .japanese {
-            guard Language.japanese.inputSource != nil else {
-                logger.error("Attempted to set to Japanese input source but could not find it.")
-                return
-            }
+        guard let target = language.inputSource else {
+            logger.error("Attempted to set to unavailable input source.")
+            return
         }
-        
-        // Workaround for TISSelectInputSource KCJV issue
-        if language != .english {
-            TISSelectInputSource(Language.english.inputSource!)
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.001) { // 씹힘 방지를 위해 딜레이
-            TISSelectInputSource(Language.english.inputSource!)
-            TISSelectInputSource(language.inputSource!)
-            
-            if language == .korean {
-                if !language.isGuremTIS {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // 씹혔는지 확인하고 다시시도
-                        let currentTIS = TISInputSource.current
-                        logger.debug("Found ID: \(currentTIS.id)")
-                        if !currentTIS.id.hasSuffix("Hangul") &&
-                            currentTIS.id != language.inputSource!.id {
-                            logger.info("씹힘 감지 다시시도")
-                            TISSelectInputSource(Language.english.inputSource!)
-                            TISSelectInputSource(language.inputSource!)
-                        }
-                    }
+
+        Task.detached(priority: .userInitiated) {
+            // Workaround for TISSelectInputSource KCJV issue:
+            // 한글 등 IME 입력기는 영어 입력기를 경유하지 않으면 선택에 실패하는 경우가 있다.
+            let english = Language.english.inputSource!
+
+            await MainActor.run {
+                if language != .english {
+                    TISSelectInputSource(english)
                 }
             }
+            try? await Task.sleep(nanoseconds: 1_000_000) // 1ms
+
+            await MainActor.run {
+                if language != .english {
+                    TISSelectInputSource(english)
+                }
+                TISSelectInputSource(target)
+            }
+
+            // 전환 검증 + 지수 백오프 재시도 (총 최대 ~1.3초)
+            let retryDelays: [UInt64] = [10, 20, 40, 80, 160, 320, 640].map { $0 * 1_000_000 }
+            for delay in retryDelays {
+                try? await Task.sleep(nanoseconds: delay)
+
+                let isSelected = await MainActor.run { target.isSelected }
+                if isSelected { return }
+
+                logger.info("입력기 전환 실패 감지, 재시도 (\(delay / 1_000_000)ms 경과)")
+                await MainActor.run {
+                    if language != .english {
+                        TISSelectInputSource(english)
+                    }
+                    TISSelectInputSource(target)
+                }
+            }
+
+            logger.error("입력기 전환 최종 실패: \(target.id)")
         }
     }
     

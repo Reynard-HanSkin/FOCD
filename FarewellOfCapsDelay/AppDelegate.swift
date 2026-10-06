@@ -5,7 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
     var statusBar: NSStatusBar!
     var statusBarItem: NSStatusItem?
     let statusBarMenu: NSMenu = NSMenu()
-    let inputManager = InputManager.shared
+    let inputManager = CapsLockMonitor.shared
     let popupFix = PopupFix.shared
     
     @UserDefault(key: "com.GST.focd.pref.showStatusMenuItem")
@@ -97,6 +97,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuItemValidation {
         let access = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent)
         if access.rawValue != 0 { // If NOT granted
             PreferenceHelper.askInputMonitoringPermission()
+        }
+
+        // CGEventTap(캡스락 이벤트 소비, HUD 억제)에 접근성 권한 필요
+        let options: NSDictionary = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        if !AXIsProcessTrustedWithOptions(options) {
+            logger.info("접근성 권한이 없어 캡스락 HUD 억제가 비활성화됩니다.")
+        } else {
+            inputManager.installEventTapIfNeeded()
         }
     }
     
